@@ -1,27 +1,13 @@
 import type { Metadata } from 'next';
-// Correctly import Geist fonts if needed, or switch back to a Google Font if Geist isn't intended
-// import { GeistSans } from 'geist/font/sans'; // Example for Geist Sans if using the package
-// import { GeistMono } from 'geist/font/mono'; // Example for Geist Mono if using the package
-import { Inter } from 'next/font/google'; // Using Inter as a standard Google Font fallback for now
+// Correctly import Geist fonts - Removed as it's causing Module not found error
+// import { GeistSans } from 'geist/font/sans';
+// import { GeistMono } from 'geist/font/mono'; // Removed as it's causing Module not found error
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import Link from 'next/link';
-import { Database, Facebook, Twitter, Linkedin, Github } from 'lucide-react'; // Import icons for footer
+import { Database, Facebook, Twitter, Linkedin, Github, Send } from 'lucide-react'; // Import icons for footer and banner
 import { cn } from "@/lib/utils";
-
-// Using Inter as a placeholder Google Font to resolve the error.
-// Replace with Geist imports if @vercel/geist is installed and intended.
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-sans', // Use --font-sans for the main font
-});
-
-// If Geist Mono is needed, it should be imported correctly.
-// Using Inter as the mono font variable for now to avoid errors.
-const interMono = Inter({
-  subsets: ['latin'],
-  variable: '--font-mono',
-});
+import { Button } from '@/components/ui/button'; // Import Button for banner
 
 
 export const metadata: Metadata = {
@@ -31,7 +17,7 @@ export const metadata: Metadata = {
 
 const AppFooter = () => {
   return (
-    <footer className="bg-card border-t mt-16 py-12">
+    <footer className="bg-card border-t py-12"> {/* Removed mt-16 */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Column 1: Brand */}
@@ -99,6 +85,25 @@ const AppFooter = () => {
   );
 };
 
+const RequestDatasetBanner = () => {
+  return (
+    <section className="bg-gradient-to-r from-primary/80 to-primary py-12 mt-16">
+       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 className="text-3xl font-bold text-primary-foreground mb-4">
+          درخواست دیتاست جدید
+        </h2>
+        <p className="text-lg text-primary-foreground/80 mb-8">
+          دیتاست مورد نظر خود را پیدا نکردید؟ به ما اطلاع دهید!
+        </p>
+        <Button size="lg" variant="secondary" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
+          <Send className="w-5 h-5 ml-2" />
+          ارسال درخواست
+        </Button>
+      </div>
+    </section>
+  );
+};
+
 
 export default function RootLayout({
   children,
@@ -106,7 +111,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fa" dir="rtl" className={cn(inter.variable, interMono.variable)} suppressHydrationWarning={true}>
+    // Remove Geist font variable, apply basic structure
+    <html lang="fa" dir="rtl" suppressHydrationWarning={true}>
       {/* Removed font variables from body, kept base styles */}
       {/* Added suppressHydrationWarning to mitigate issues with browser extensions modifying the DOM */}
       {/* Apply font-sans which uses the --font-sans variable */}
@@ -115,6 +121,7 @@ export default function RootLayout({
            <main className="flex-grow">
              {children}
            </main>
+           <RequestDatasetBanner /> {/* Add the new banner section */}
            <AppFooter /> {/* Add the new footer */}
          </div>
         <Toaster />

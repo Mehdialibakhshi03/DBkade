@@ -4,10 +4,11 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%; /* White */
+    /* Updated background to a very light purple/gray */
+    --background: 262 30% 97.5%; /* Lighter, less saturated purple/gray */
     --foreground: 240 10% 3.9%; /* Dark Gray/Near Black */
 
-    --card: 0 0% 100%;
+    --card: 0 0% 100%; /* Keep cards white for contrast */
     --card-foreground: 240 10% 3.9%;
 
     --popover: 0 0% 100%;
@@ -56,10 +57,11 @@
   }
 
   .dark {
-    --background: 240 10% 3.9%; /* Dark Gray/Near Black */
+     /* Updated dark background to a subtle dark purple/gray */
+    --background: 262 10% 10%; /* Darker, less saturated purple/gray */
     --foreground: 0 0% 98%; /* Near White */
 
-    --card: 240 10% 3.9%;
+    --card: 240 10% 13%; /* Slightly lighter dark for cards */
     --card-foreground: 0 0% 98%;
 
     --popover: 240 10% 3.9%;
@@ -111,8 +113,8 @@
   }
   body {
     @apply bg-background text-foreground;
-    /* Apply the Geist font */
-    font-family: var(--font-geist-sans), sans-serif;
+    /* Removed Geist font */
+    /* font-family: var(--font-geist-sans), sans-serif; */
   }
 }
 
@@ -131,3 +133,11 @@
 .animate-bounce-subtle {
   animation: bounce-subtle 2s infinite;
 }
+
+/* Apply gradient to Slider Track */
+/* Ensure this targets the correct primitive parts if needed */
+/* Example below is generic, adjust based on Slider component structure */
+/* This is now handled directly in the Slider component using CSS variables */
+/* .slider-track-background {
+  background: linear-gradient(to right, hsl(var(--slider-gradient-from)), hsl(var(--slider-gradient-to)));
+} */
