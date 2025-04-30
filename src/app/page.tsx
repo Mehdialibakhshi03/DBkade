@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Database, Search, Star, Download } from 'lucide-react';
+import { Database, Search, Star, Download, Grid, BarChart, DollarSign, Car, Plane, MapPin } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,6 +38,16 @@ const popularDatabases = [
     tags: ['اقتصاد', 'خودرو', 'قیمت'],
     downloads: 4123,
   },
+];
+
+// Mock data for categories
+const databaseCategories = [
+  { name: 'جغرافیا و نقشه', icon: MapPin, color: 'text-emerald-500', bgColor: 'bg-emerald-50' },
+  { name: 'اقتصاد و بازار', icon: DollarSign, color: 'text-blue-500', bgColor: 'bg-blue-50' },
+  { name: 'آمار و جمعیت', icon: BarChart, color: 'text-yellow-500', bgColor: 'bg-yellow-50' },
+  { name: 'حمل و نقل', icon: Car, color: 'text-red-500', bgColor: 'bg-red-50' },
+  { name: 'گردشگری', icon: Plane, color: 'text-purple-500', bgColor: 'bg-purple-50' },
+  // Add more categories as needed
 ];
 
 export default function HomePage() {
@@ -85,6 +95,25 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+       {/* Categories Section */}
+      <section className="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
+        <h3 className="text-2xl font-semibold mb-8 text-center">
+          <Grid className="w-6 h-6 inline-block text-primary mb-1 ml-2" />
+          دسته‌بندی دیتاست‌ها
+        </h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          {databaseCategories.map((category) => (
+            <Link key={category.name} href={`/category/${category.name}`} passHref>
+                <div className={`flex flex-col items-center justify-center p-4 rounded-lg border ${category.bgColor} hover:shadow-md transition-shadow cursor-pointer group`}>
+                  <category.icon className={`w-10 h-10 mb-2 ${category.color} group-hover:scale-110 transition-transform`} />
+                  <span className={`text-sm font-medium ${category.color.replace('text-','text-')}`}>{category.name}</span>
+                </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
 
       {/* Popular Databases Section */}
       <section className="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
@@ -136,12 +165,8 @@ export default function HomePage() {
           </div>
       </section>
 
-       {/* Footer */}
-       <footer className="border-t mt-12 py-6">
-         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-muted-foreground">
-           &copy; {new Date().getFullYear()} دیتا اکسپلورر. تمامی حقوق محفوظ است.
-         </div>
-       </footer>
+       {/* Removed simple Footer, now handled by RootLayout */}
+
     </div>
   );
 }

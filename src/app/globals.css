@@ -48,6 +48,11 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 240 5.9% 90%;
     --sidebar-ring: 262 84% 58%; /* Purple */
+
+    /* Add slider gradient variables */
+    --slider-gradient-from: 262 84% 58%; /* Primary Purple */
+    --slider-gradient-to: 280 80% 65%; /* Lighter Purple/Pinkish */
+
   }
 
   .dark {
@@ -93,6 +98,10 @@
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 262 88% 70%; /* Lighter Purple */
+
+    /* Add dark mode slider gradient variables */
+    --slider-gradient-from: 262 88% 70%; /* Lighter Primary Purple */
+    --slider-gradient-to: 280 85% 75%; /* Even Lighter Purple/Pinkish */
   }
 }
 

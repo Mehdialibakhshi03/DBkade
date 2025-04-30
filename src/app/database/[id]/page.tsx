@@ -15,6 +15,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import { Slider } from "@/components/ui/slider"; // Import Slider
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Import Select components
 import { useToast } from "@/hooks/use-toast"; // Import useToast hook
 
 
@@ -48,6 +50,7 @@ const databaseInfo = {
   filters: [
     { id: 'province', label: 'استان', type: 'select', options: ['تهران', 'اصفهان', 'خراسان رضوی', 'فارس', 'آذربایجان شرقی'] },
     { id: 'population', label: 'جمعیت', type: 'range', min: 0, max: 500000 },
+    { id: 'update_status', label: 'وضعیت بروزرسانی', type: 'select', options: ['بروز شده', 'نیاز به بروزرسانی', 'قدیمی'] },
   ]
 };
 
@@ -75,32 +78,43 @@ export default function DatabaseDetail() {
     );
   };
 
-  // Add a filter (placeholder, actual implementation depends on filter UI)
-  const addFilter = (filterId: string) => {
-     // For demo, add a placeholder filter state
-     // In a real app, this would capture the value from the input/select
-    const existingFilterIndex = selectedFilters.findIndex(f => f.id === filterId);
-    const filterDefinition = databaseInfo.filters.find(f => f.id === filterId);
-
-    if (!filterDefinition) return;
-
-    let newValue: any;
-    if(filterDefinition.type === 'select') {
-      newValue = filterDefinition.options?.[0]; // Default to first option
-    } else if(filterDefinition.type === 'range') {
-      newValue = { min: filterDefinition.min, max: filterDefinition.max }; // Default to full range
-    } else {
-      newValue = ''; // Default for other types
-    }
-
-    if (existingFilterIndex === -1) {
-       setSelectedFilters([...selectedFilters, { id: filterId, value: newValue }]);
-       toast({ title: "فیلتر اضافه شد", description: `فیلتر "${filterDefinition.label}" اضافه شد.` });
-    } else {
-       // Optionally update existing filter or notify user
-       toast({ title: "فیلتر موجود است", description: `فیلتر "${filterDefinition.label}" از قبل وجود دارد.` });
+  // Function to handle filter value changes
+  const handleFilterChange = (filterId: string, newValue: any) => {
+    setSelectedFilters(prev =>
+      prev.map(f => (f.id === filterId ? { ...f, value: newValue } : f))
+    );
+    const filter = databaseInfo.filters.find(f => f.id === filterId);
+    // You might want to add a small delay or debounce this toast if changes are frequent
+    if(filter){
+        toast({ title: "فیلتر بروز شد", description: `مقدار فیلتر "${filter.label}" تغییر کرد.` });
     }
   };
+
+
+  // Add a filter
+  const addFilter = (filterId: string) => {
+     const existingFilterIndex = selectedFilters.findIndex(f => f.id === filterId);
+     const filterDefinition = databaseInfo.filters.find(f => f.id === filterId);
+
+     if (!filterDefinition) return;
+
+     if (existingFilterIndex === -1) {
+        let defaultValue: any;
+        if(filterDefinition.type === 'select') {
+            defaultValue = filterDefinition.options?.[0]; // Default to first option or undefined
+        } else if(filterDefinition.type === 'range') {
+            // Store the full range initially
+            defaultValue = [filterDefinition.min ?? 0, filterDefinition.max ?? 100];
+        } else {
+            defaultValue = ''; // Default for other types
+        }
+
+        setSelectedFilters([...selectedFilters, { id: filterId, value: defaultValue }]);
+        toast({ title: "فیلتر اضافه شد", description: `فیلتر "${filterDefinition.label}" اضافه شد.` });
+     } else {
+        toast({ title: "فیلتر موجود است", description: `فیلتر "${filterDefinition.label}" از قبل وجود دارد.`, variant: "default" });
+     }
+   };
 
   // Remove a filter
   const removeFilter = (filterId: string) => {
@@ -121,7 +135,16 @@ export default function DatabaseDetail() {
   // Generate sample API code
   const generateSampleCode = useMemo(() => {
     const columnsParam = selectedColumns.join(',');
-    const filterParams = selectedFilters.map(f => `${f.id}=${encodeURIComponent(JSON.stringify(f.value))}`).join('&');
+    const filterParams = selectedFilters.map(f => {
+        let valueString;
+        // Special handling for range values if stored as array [min, max]
+        if (Array.isArray(f.value) && f.value.length === 2) {
+            valueString = encodeURIComponent(JSON.stringify({ min: f.value[0], max: f.value[1] }));
+        } else {
+            valueString = encodeURIComponent(JSON.stringify(f.value));
+        }
+        return `${f.id}=${valueString}`;
+    }).join('&');
     const fullParams = `columns=${columnsParam}${filterParams ? `&${filterParams}` : ''}`;
 
     if (apiCodeFormat === 'curl') {
@@ -138,6 +161,22 @@ fetch('https://api.datapress.ir/v1/databases/postal-codes?${fullParams}', {
 .then(data => console.log(data))
 .catch(error => console.error('Error:', error));`;
     } else if (apiCodeFormat === 'python') {
+      const paramsDict = selectedFilters.reduce((acc, f) => {
+        let value;
+         // Special handling for range values if stored as array [min, max]
+        if (Array.isArray(f.value) && f.value.length === 2) {
+            value = `{"min": ${f.value[0]}, "max": ${f.value[1]}}`;
+        } else {
+            value = JSON.stringify(f.value); // Use dumps for general JSON compatibility
+        }
+        acc[f.id] = `json.dumps(${value})`;
+        return acc;
+      }, {} as Record<string, string>);
+
+      const paramsString = Object.entries(paramsDict)
+        .map(([key, val]) => `    "${key}": ${val}`)
+        .join(',\n');
+
       return `# با استفاده از requests در پایتون
 import requests
 import json
@@ -146,12 +185,17 @@ url = "https://api.datapress.ir/v1/databases/postal-codes"
 headers = {"Authorization": "Bearer YOUR_API_KEY"}
 params = {
     "columns": "${columnsParam}",
-${selectedFilters.map(f => `    "${f.id}": json.dumps(${JSON.stringify(f.value)})`).join(',\n')}
-}
+${paramsString ? `${paramsString}\n` : ''}}
 
 response = requests.get(url, headers=headers, params=params)
-data = response.json()
-print(data)`;
+
+if response.status_code == 200:
+    data = response.json()
+    print(data)
+else:
+    print(f"Error: {response.status_code}")
+    print(response.text)
+`;
     }
     return '';
   }, [selectedColumns, selectedFilters, apiCodeFormat]);
@@ -299,13 +343,14 @@ print(data)`;
             </Card>
 
             {/* Column Selection & Filters Card */}
-            <Card>
+             <Card>
               <CardHeader>
                 <CardTitle>انتخاب ستون‌ها و فیلتر</CardTitle>
               </CardHeader>
               <CardContent>
-                 <h3 className="text-md font-semibold mb-3">انتخاب ستون‌ها</h3>
-                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
+                {/* Column Selection */}
+                <h3 className="text-md font-semibold mb-3">انتخاب ستون‌ها</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
                   {databaseInfo.columns.map((column) => (
                     <div key={column.name} className="flex items-center space-x-2 space-x-reverse">
                       <Checkbox
@@ -323,86 +368,109 @@ print(data)`;
 
                 <Separator className="my-6" />
 
-                <h3 className="text-md font-semibold mb-3">فیلترها</h3>
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  {databaseInfo.filters.map((filter) => (
-                     <Card key={filter.id} className="bg-secondary/30">
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="font-medium text-sm">{filter.label}</span>
-                           <Button
-                             variant="outline"
-                             size="sm"
-                             onClick={() => addFilter(filter.id)}
-                             disabled={selectedFilters.some(f => f.id === filter.id)} // Disable if already added
-                           >
-                             <Filter className="w-3 h-3 ml-1" />
-                             افزودن
-                           </Button>
-                        </div>
+                {/* Filter Selection */}
+                <h3 className="text-md font-semibold mb-3">افزودن فیلتر</h3>
+                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                   {databaseInfo.filters.map((filter) => (
+                     <Button
+                       key={filter.id}
+                       variant="outline"
+                       onClick={() => addFilter(filter.id)}
+                       disabled={selectedFilters.some(f => f.id === filter.id)}
+                       className="justify-start"
+                     >
+                       <Filter className="w-4 h-4 ml-2" />
+                       {filter.label}
+                     </Button>
+                   ))}
+                 </div>
 
-                        {filter.type === 'range' && filter.min !== undefined && filter.max !== undefined && (
-                          <div className="flex items-center space-x-2 space-x-reverse pt-2">
-                             <span className="text-xs text-muted-foreground">{filter.min.toLocaleString()}</span>
-                             {/* Range slider - Using basic input range for simplicity */}
-                             <Input
-                               type="range"
-                               min={filter.min}
-                               max={filter.max}
-                               className="w-full h-2 cursor-pointer"
-                               // onChange/value would be needed for interactive filtering
-                               disabled={!selectedFilters.some(f => f.id === filter.id)} // Enable only if filter is active
-                             />
-                             <span className="text-xs text-muted-foreground">{filter.max.toLocaleString()}</span>
-                          </div>
-                        )}
-                         {filter.type === 'select' && filter.options && (
-                           <div className="flex flex-wrap gap-1 pt-1">
-                             {filter.options.slice(0, 3).map((option, idx) => (
-                               <Badge key={idx} variant="outline">{option}</Badge>
-                             ))}
-                             {filter.options.length > 3 && (
-                               <Badge variant="outline">+{filter.options.length - 3} مورد دیگر</Badge>
-                             )}
-                           </div>
-                         )}
-                         {/* Placeholder for other filter types */}
-                         {filter.type !== 'range' && filter.type !== 'select' && (
-                            <p className="text-xs text-muted-foreground pt-1">کنترل فیلتر نوع '{filter.type}' در اینجا قرار می‌گیرد.</p>
-                         )}
-                      </CardContent>
-                     </Card>
-                  ))}
-                </div>
-
+                {/* Active Filters */}
                  {selectedFilters.length > 0 && (
-                   <div className="space-y-2">
-                     <Label className="text-xs text-muted-foreground">فیلترهای فعال:</Label>
-                     <div className="flex flex-wrap gap-2">
-                      {selectedFilters.map((filterState) => {
-                        const filter = databaseInfo.filters.find(f => f.id === filterState.id);
-                        return (
-                           <Badge key={filterState.id} variant="default" className="flex items-center">
-                            <span>{filter?.label}</span>
-                             <Button
-                               variant="ghost"
-                               size="icon"
-                               className="h-4 w-4 mr-1 text-primary-foreground hover:bg-primary/80"
-                               onClick={() => removeFilter(filterState.id)}
-                             >
-                               <X className="w-3 h-3" />
-                               <span className="sr-only">حذف فیلتر</span>
-                             </Button>
-                           </Badge>
-                        );
-                      })}
-                      <Button variant="link" size="sm" className="text-red-500 px-1" onClick={clearAllFilters}>حذف همه</Button>
+                   <>
+                    <Separator className="my-6" />
+                     <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-md font-semibold">فیلترهای فعال</h3>
+                        <Button variant="link" size="sm" className="text-red-500 px-1 h-auto py-0" onClick={clearAllFilters}>حذف همه</Button>
                      </div>
-                   </div>
-                 )}
+                     <div className="space-y-6">
+                       {selectedFilters.map((filterState) => {
+                         const filter = databaseInfo.filters.find(f => f.id === filterState.id);
+                         if (!filter) return null;
 
+                         return (
+                           <Card key={filterState.id} className="bg-secondary/50">
+                             <CardHeader className="p-4">
+                               <div className="flex justify-between items-center">
+                                 <Label htmlFor={`filter-control-${filter.id}`} className="text-sm font-medium">{filter.label}</Label>
+                                 <Button
+                                   variant="ghost"
+                                   size="icon"
+                                   className="h-6 w-6 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                                   onClick={() => removeFilter(filterState.id)}
+                                 >
+                                   <X className="w-4 h-4" />
+                                   <span className="sr-only">حذف فیلتر {filter.label}</span>
+                                 </Button>
+                               </div>
+                             </CardHeader>
+                             <CardContent className="p-4 pt-0">
+                               {/* Render appropriate control based on filter type */}
+                               {filter.type === 'range' && filter.min !== undefined && filter.max !== undefined && Array.isArray(filterState.value) && (
+                                 <div className="space-y-3">
+                                   <Slider
+                                     id={`filter-control-${filter.id}`}
+                                     min={filter.min}
+                                     max={filter.max}
+                                     step={1} // Or calculate based on range
+                                     value={filterState.value as [number, number]}
+                                     onValueChange={(newValue) => handleFilterChange(filter.id, newValue)}
+                                     className="w-full [&>span:first-child]:h-2 [&>span:first-child>span]:h-2 [&>span:last-child]:h-5 [&>span:last-child]:w-5" // Apply gradient style via globals.css
+                                   />
+                                   <div className="flex justify-between text-xs text-muted-foreground">
+                                     <span>{filterState.value[0].toLocaleString()}</span>
+                                     <span>{filterState.value[1].toLocaleString()}</span>
+                                   </div>
+                                 </div>
+                               )}
+
+                               {filter.type === 'select' && filter.options && (
+                                 <Select
+                                   value={filterState.value as string}
+                                   onValueChange={(newValue) => handleFilterChange(filter.id, newValue)}
+                                 >
+                                   <SelectTrigger id={`filter-control-${filter.id}`}>
+                                     <SelectValue placeholder={`انتخاب ${filter.label}`} />
+                                   </SelectTrigger>
+                                   <SelectContent>
+                                     {filter.options.map((option) => (
+                                       <SelectItem key={option} value={option}>
+                                         {option}
+                                       </SelectItem>
+                                     ))}
+                                   </SelectContent>
+                                 </Select>
+                               )}
+
+                                {filter.type !== 'range' && filter.type !== 'select' && (
+                                  <Input
+                                    id={`filter-control-${filter.id}`}
+                                    type="text" // Default or map to other input types
+                                    value={filterState.value as string}
+                                    onChange={(e) => handleFilterChange(filter.id, e.target.value)}
+                                    placeholder={`مقدار برای ${filter.label}...`}
+                                  />
+                                )}
+                             </CardContent>
+                           </Card>
+                         );
+                       })}
+                     </div>
+                   </>
+                 )}
               </CardContent>
             </Card>
+
 
             {/* Preview Table Card */}
             <Card>
@@ -599,12 +667,7 @@ print(data)`;
         </div>
       </main>
 
-       {/* Footer (Optional) */}
-       <footer className="border-t mt-12 py-6">
-         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-muted-foreground">
-           &copy; {new Date().getFullYear()} دیتا اکسپلورر. تمامی حقوق محفوظ است.
-         </div>
-       </footer>
+       {/* Footer is now handled globally in layout.tsx */}
     </div>
   );
 }
