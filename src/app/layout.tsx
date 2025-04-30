@@ -1,7 +1,11 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Geist, Geist_Mono } from 'next/font/google'; // Keeping Geist as per error context
 import './globals.css';
-import { Toaster } from "@/components/ui/toaster"; // Import Toaster
+import { Toaster } from "@/components/ui/toaster";
+
+// If Vazirmatn was intended, it should be imported and used here instead of Geist
+// import { Vazirmatn } from 'next/font/google';
+// const vazirmatn = Vazirmatn({ subsets: ['arabic', 'latin'], variable: '--font-vazirmatn' });
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -24,10 +28,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" dir="rtl"> {/* Set default direction to RTL */}
-      <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>
+    // Apply font variables directly to html tag and ensure no extra whitespace
+    <html lang="fa" dir="rtl" className={`${geistSans.variable} ${geistMono.variable}`}>
+      {/* Removed font variables from body, kept base styles */}
+      <body className="font-sans antialiased">
         {children}
-        <Toaster /> {/* Add Toaster component */}
+        <Toaster />
       </body>
     </html>
   );
