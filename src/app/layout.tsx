@@ -1,19 +1,28 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google'; // Using Geist as per project setup
+// Correctly import Geist fonts if needed, or switch back to a Google Font if Geist isn't intended
+// import { GeistSans } from 'geist/font/sans'; // Example for Geist Sans if using the package
+// import { GeistMono } from 'geist/font/mono'; // Example for Geist Mono if using the package
+import { Inter } from 'next/font/google'; // Using Inter as a standard Google Font fallback for now
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import Link from 'next/link';
 import { Database, Facebook, Twitter, Linkedin, Github } from 'lucide-react'; // Import icons for footer
+import { cn } from "@/lib/utils";
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+// Using Inter as a placeholder Google Font to resolve the error.
+// Replace with Geist imports if @vercel/geist is installed and intended.
+const inter = Inter({
   subsets: ['latin'],
+  variable: '--font-sans', // Use --font-sans for the main font
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+// If Geist Mono is needed, it should be imported correctly.
+// Using Inter as the mono font variable for now to avoid errors.
+const interMono = Inter({
   subsets: ['latin'],
+  variable: '--font-mono',
 });
+
 
 export const metadata: Metadata = {
   title: 'Data Explorer',
@@ -97,9 +106,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fa" dir="rtl" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning={true}>
+    <html lang="fa" dir="rtl" className={cn(inter.variable, interMono.variable)} suppressHydrationWarning={true}>
       {/* Removed font variables from body, kept base styles */}
       {/* Added suppressHydrationWarning to mitigate issues with browser extensions modifying the DOM */}
+      {/* Apply font-sans which uses the --font-sans variable */}
       <body className="font-sans antialiased">
         <div className="flex flex-col min-h-screen">
            <main className="flex-grow">
