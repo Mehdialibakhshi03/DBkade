@@ -59,8 +59,18 @@ export default function HomePage() {
       </header>
 
       {/* Hero Section */}
-      <section className="py-20 px-4 text-center bg-gradient-to-b from-background to-secondary/30">
-        <div className="max-w-3xl mx-auto">
+      <section className="relative py-20 px-4 text-center bg-gradient-to-b from-background to-secondary/30 overflow-hidden">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 z-0 opacity-10 dark:opacity-5 pointer-events-none">
+           {/* Position icons randomly */}
+           <Database className="absolute top-[10%] left-[5%] h-16 w-16 text-primary animate-bounce-subtle" style={{ animationDelay: '0s' }} />
+           <Database className="absolute top-[30%] right-[10%] h-12 w-12 text-primary animate-bounce-subtle" style={{ animationDelay: '0.5s' }} />
+           <Database className="absolute bottom-[20%] left-[15%] h-20 w-20 text-primary animate-bounce-subtle" style={{ animationDelay: '1s' }} />
+           <Database className="absolute bottom-[10%] right-[25%] h-10 w-10 text-primary animate-bounce-subtle" style={{ animationDelay: '1.5s' }} />
+           <Database className="absolute top-[50%] left-[30%] h-14 w-14 text-primary animate-bounce-subtle" style={{ animationDelay: '2s' }} />
+        </div>
+
+        <div className="relative z-10 max-w-3xl mx-auto">
           <h2 className="text-4xl font-bold mb-4">مرکز داده‌های ایران</h2>
           <p className="text-lg text-muted-foreground mb-8">
             دسترسی آسان و سریع به مجموعه‌ای غنی از داده‌های عمومی و تخصصی ایران
@@ -69,7 +79,7 @@ export default function HomePage() {
             <Input
               type="search"
               placeholder="جستجو در میان دیتاست‌ها..."
-              className="w-full h-12 pl-10 pr-4 text-base rounded-full shadow-md"
+              className="w-full h-12 pl-10 pr-4 text-base rounded-full shadow-md bg-background" // Ensure background for visibility
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           </div>
