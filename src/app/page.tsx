@@ -2,13 +2,13 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Database, Search, Star, Download, Grid, BarChart, DollarSign, Car, Plane, MapPin } from 'lucide-react';
+import { Database, Search, Star, Download, Grid, BarChart, DollarSign, Car, Plane, MapPin, Calendar, DatabaseZap } from 'lucide-react'; // Added Calendar, DatabaseZap
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-// Mock data for popular databases
+// Mock data for popular databases - Added lastUpdate and recordCount
 const popularDatabases = [
   {
     id: 'postal-codes',
@@ -16,6 +16,8 @@ const popularDatabases = [
     description: 'مجموعه کامل کدهای پستی ۱۰ رقمی تمام شهرها و روستاهای ایران به تفکیک استان',
     tags: ['جغرافیا', 'ایران', 'کدپستی'],
     downloads: 3764,
+    lastUpdate: '۱۴۰۳/۰۱/۲۰', // Added
+    recordCount: 148329, // Added
   },
   {
     id: 'iran-divisions',
@@ -23,6 +25,8 @@ const popularDatabases = [
     description: 'لیست کامل استان‌ها، شهرستان‌ها، بخش‌ها، شهرها و دهستان‌های ایران',
     tags: ['جغرافیا', 'ایران', 'تقسیمات کشوری'],
     downloads: 2510,
+    lastUpdate: '۱۴۰۲/۱۱/۰۵', // Added
+    recordCount: 78500, // Added
   },
   {
     id: 'city-coordinates',
@@ -30,6 +34,8 @@ const popularDatabases = [
     description: 'مختصات دقیق طول و عرض جغرافیایی مراکز شهرهای ایران',
     tags: ['جغرافیا', 'ایران', 'مختصات'],
     downloads: 1893,
+    lastUpdate: '۱۴۰۲/۰۹/۱۵', // Added
+    recordCount: 1400, // Added
   },
     {
     id: 'car-prices',
@@ -37,6 +43,8 @@ const popularDatabases = [
     description: 'آخرین قیمت خودروهای داخلی و خارجی در بازار ایران',
     tags: ['اقتصاد', 'خودرو', 'قیمت'],
     downloads: 4123,
+    lastUpdate: '۱۴۰۳/۰۳/۱۰', // Added
+    recordCount: 350, // Added
   },
 ];
 
@@ -85,13 +93,17 @@ export default function HomePage() {
           <p className="text-lg text-muted-foreground mb-8">
             دسترسی آسان و سریع به مجموعه‌ای غنی از داده‌های عمومی و تخصصی ایران
           </p>
-          <div className="relative max-w-xl mx-auto">
+          {/* Updated Search Input and Button */}
+          <div className="flex max-w-xl mx-auto space-x-2 space-x-reverse">
             <Input
               type="search"
               placeholder="جستجو در میان دیتاست‌ها..."
-              className="w-full h-12 pl-10 pr-4 text-base rounded-full shadow-md bg-background" // Ensure background for visibility
+              className="flex-grow h-12 pr-4 text-base rounded-lg shadow-md bg-background" // Removed pl-10, changed rounded-full to rounded-lg
             />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Button size="lg" className="h-12 px-6 rounded-lg"> {/* Added Search Button */}
+              <Search className="w-5 h-5 ml-2" />
+              جستجو
+            </Button>
           </div>
         </div>
       </section>
@@ -105,9 +117,10 @@ export default function HomePage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {databaseCategories.map((category) => (
             <Link key={category.name} href={`/category/${category.name}`} passHref>
-                <div className={`flex flex-col items-center justify-center p-4 rounded-lg border ${category.bgColor} hover:shadow-md transition-shadow cursor-pointer group`}>
+                <div className={`flex flex-col items-center justify-center p-4 rounded-lg border ${category.bgColor} hover:shadow-md transition-shadow cursor-pointer group dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700`}>
                   <category.icon className={`w-10 h-10 mb-2 ${category.color} group-hover:scale-110 transition-transform`} />
-                  <span className={`text-sm font-medium ${category.color.replace('text-','text-')}`}>{category.name}</span>
+                  {/* Adjusted text color for dark mode potentially */}
+                  <span className={`text-sm font-medium ${category.color.replace('text-','text-')} dark:text-gray-300`}>{category.name}</span>
                 </div>
             </Link>
           ))}
@@ -123,7 +136,7 @@ export default function HomePage() {
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {popularDatabases.map((db) => (
-            <Card key={db.id} className="hover:shadow-lg transition-shadow duration-300">
+            <Card key={db.id} className="hover:shadow-lg transition-shadow duration-300 flex flex-col"> {/* Added flex flex-col */}
               <CardHeader>
                 <div className="flex items-center mb-2">
                   <Database className="w-5 h-5 mr-2 text-primary" />
@@ -137,20 +150,30 @@ export default function HomePage() {
                     {db.description}
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="flex justify-between items-center text-sm">
-                  <div className="flex flex-wrap gap-1">
+              <CardContent className="flex-grow flex flex-col justify-between"> {/* Added flex-grow and flex for spacing */}
+                <div>
+                  <div className="flex flex-wrap gap-1 mb-3">
                     {db.tags.map((tag, index) => (
                       <Badge key={index} variant="secondary">{tag}</Badge>
                     ))}
                   </div>
-                   <div className="flex items-center text-muted-foreground">
-                     <Download className="w-4 h-4 ml-1"/>
-                     {db.downloads.toLocaleString()}
+                  <div className="space-y-1 text-sm text-muted-foreground mb-4">
+                    <div className="flex items-center">
+                      <Calendar className="w-4 h-4 ml-1.5" />
+                      آخرین بروزرسانی: {db.lastUpdate}
+                    </div>
+                    <div className="flex items-center">
+                      <DatabaseZap className="w-4 h-4 ml-1.5" />
+                      تعداد رکورد: {db.recordCount.toLocaleString()}
+                    </div>
+                    <div className="flex items-center">
+                     <Download className="w-4 h-4 ml-1.5"/>
+                     تعداد دانلود: {db.downloads.toLocaleString()}
                    </div>
+                  </div>
                 </div>
-                 <Link href={`/database/${db.id}`} className="mt-4 block w-full">
-                    <Button variant="outline" className="w-full">
+                 <Link href={`/database/${db.id}`} className="mt-auto block w-full"> {/* Added mt-auto */}
+                    <Button variant="default" className="w-full"> {/* Changed variant to default */}
                         مشاهده جزئیات
                     </Button>
                  </Link>
@@ -164,8 +187,6 @@ export default function HomePage() {
             </Button>
           </div>
       </section>
-
-       {/* Removed simple Footer, now handled by RootLayout */}
 
     </div>
   );
