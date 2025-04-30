@@ -31,7 +31,8 @@ export default function RootLayout({
     // Apply font variables directly to html tag and ensure no extra whitespace
     <html lang="fa" dir="rtl" className={`${geistSans.variable} ${geistMono.variable}`}>
       {/* Removed font variables from body, kept base styles */}
-      <body className="font-sans antialiased">
+      {/* Added suppressHydrationWarning to mitigate issues with browser extensions modifying the DOM */}
+      <body className="font-sans antialiased" suppressHydrationWarning={true}>
         {children}
         <Toaster />
       </body>
