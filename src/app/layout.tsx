@@ -99,20 +99,7 @@ export default function RootLayout({
       {/* Apply font-sans which uses the --font-sans variable */}
       <body className="font-sans antialiased bg-background text-foreground" suppressHydrationWarning> {/* Apply background and text colors, add suppressHydrationWarning */}
         <div className="flex flex-col min-h-screen">
-           {/* Global Header */}
-           <header className="bg-card border-b sticky top-0 z-50">
-             <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
-               <Link href="/" className="flex items-center"> {/* Wrap logo and title in Link */}
-                 <Database className="h-8 w-8 text-primary mr-2" />
-                 <h1 className="text-xl font-bold">دیتا اکسپلورر</h1>
-               </Link>
-               <div className="flex items-center space-x-4 space-x-reverse">
-                 <Button>
-                   ورود / ثبت‌نام
-                 </Button>
-               </div>
-             </div>
-           </header>
+           {/* Global Header removed - will be added in specific layouts or pages */}
 
            <main className="flex-grow">
              {children}

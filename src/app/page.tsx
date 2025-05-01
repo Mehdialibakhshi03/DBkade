@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Database, Search, Star, Download, Grid, BarChart, DollarSign, Car, Plane, MapPin, Calendar, DatabaseZap } from 'lucide-react'; // Added Calendar, DatabaseZap
+import { Database, Search, Star, Download, Grid, BarChart, DollarSign, Car, Plane, MapPin, Calendar, DatabaseZap, LayoutDashboard } from 'lucide-react'; // Added Calendar, DatabaseZap, LayoutDashboard
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -58,10 +58,35 @@ const databaseCategories = [
   // Add more categories as needed
 ];
 
+// Header component specific to this page
+function HomePageHeader() {
+  return (
+    <header className="bg-card border-b sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
+        <Link href="/" className="flex items-center"> {/* Wrap logo and title in Link */}
+          <Database className="h-8 w-8 text-primary mr-2" />
+          <h1 className="text-xl font-bold">دیتا اکسپلورر</h1>
+        </Link>
+        <div className="flex items-center space-x-4 space-x-reverse">
+          <Button asChild variant="outline">
+             <Link href="/admin">
+               <LayoutDashboard className="w-4 h-4 ml-2" />
+               پنل مدیریت
+             </Link>
+           </Button>
+          <Button>
+            ورود / ثبت‌نام
+          </Button>
+        </div>
+      </div>
+    </header>
+  );
+}
+
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Header is removed from here, handled by layout.tsx */}
+      <HomePageHeader /> {/* Add the specific header */}
 
       {/* Hero Section */}
       <section className="relative py-20 px-4 text-center bg-gradient-to-b from-background to-primary/5 overflow-hidden"> {/* Changed gradient */}
@@ -105,7 +130,7 @@ export default function HomePage() {
           {databaseCategories.map((category) => (
             <Link key={category.name} href={`/category/${category.name}`} passHref>
                 {/* Updated category box styling with better hover */}
-                <div className={`flex flex-col items-center justify-center p-4 rounded-lg border border-primary bg-primary/5 hover:bg-primary/10 hover:shadow-md transition-all duration-300 cursor-pointer group`}>
+                 <div className={`flex flex-col items-center justify-center p-4 rounded-lg border border-primary bg-primary/5 hover:bg-primary/10 hover:shadow-lg transition-all duration-300 cursor-pointer group`}>
                   <category.icon className={`w-10 h-10 mb-2 text-primary group-hover:scale-110 transition-transform`} />
                   <span className={`text-sm font-medium text-primary`}>{category.name}</span>
                 </div>
