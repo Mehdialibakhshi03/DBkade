@@ -61,20 +61,7 @@ const databaseCategories = [
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Header */}
-      <header className="bg-card border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <div className="flex items-center">
-            <Database className="h-8 w-8 text-primary mr-2" />
-            <h1 className="text-xl font-bold">دیتا اکسپلورر</h1>
-          </div>
-          <div className="flex items-center space-x-4 space-x-reverse">
-            <Button>
-              ورود / ثبت‌نام
-            </Button>
-          </div>
-        </div>
-      </header>
+      {/* Header is removed from here, handled by layout.tsx */}
 
       {/* Hero Section */}
       <section className="relative py-20 px-4 text-center bg-gradient-to-b from-background to-primary/5 overflow-hidden"> {/* Changed gradient */}
@@ -188,6 +175,7 @@ export default function HomePage() {
           </div>
       </section>
 
+      {/* Footer is handled by layout.tsx */}
     </div>
   );
 }

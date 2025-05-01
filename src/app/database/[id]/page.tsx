@@ -1,6 +1,7 @@
 'use client'; // Mark as Client Component
 
 import React, { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation'; // Import useRouter for navigation
 import {
   Database, Download, FileJson, FileText, File, Code,
   Copy, Eye, Calendar, HardDrive, BarChart, Check, Filter, ArrowLeft, Info, Star,
@@ -63,6 +64,7 @@ interface FilterState {
 
 export default function DatabaseDetail() {
   const { toast } = useToast(); // Initialize toast hook
+  const router = useRouter(); // Initialize router
   const [selectedColumns, setSelectedColumns] = useState<string[]>(databaseInfo.columns.map(c => c.name)); // Default all columns selected
   const [exportFormat, setExportFormat] = useState<'csv' | 'json' | 'sql' | 'xlsx' | 'curl' | 'js' | 'python'>('csv');
   const [selectedFilters, setSelectedFilters] = useState<FilterState[]>([]);
@@ -245,31 +247,11 @@ else:
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Header */}
-      <header className="bg-card border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <div className="flex items-center">
-            <Database className="h-8 w-8 text-primary mr-2" />
-            <h1 className="text-xl font-bold">دیتا اکسپلورر</h1>
-          </div>
-          <div className="flex items-center space-x-4 space-x-reverse">
-             {/* Consider using Link component for navigation */}
-             <a href="/">
-               <Button variant="ghost">
-                 <ArrowLeft className="w-4 h-4 ml-2" />
-                 بازگشت به خانه
-               </Button>
-             </a>
-             <Button>
-              ورود / ثبت‌نام
-             </Button>
-          </div>
-        </div>
-      </header>
+      {/* Header is removed, handled globally in layout.tsx */}
 
       {/* Breadcrumbs */}
       <div className="bg-card border-b">
-        <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8 flex justify-between items-center"> {/* Added justify-between */}
           <div className="flex items-center text-sm text-muted-foreground">
              {/* Consider using Link component for navigation */}
              <a href="/" className="hover:text-primary">خانه</a>
@@ -279,6 +261,11 @@ else:
             <span className="mx-2">/</span>
             <span className="text-foreground font-medium">{databaseInfo.title}</span>
           </div>
+           {/* Back Button */}
+           <Button variant="ghost" onClick={() => router.back()}>
+              <ArrowLeft className="w-4 h-4 ml-2" />
+              بازگشت
+            </Button>
         </div>
       </div>
 
