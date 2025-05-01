@@ -48,13 +48,13 @@ const popularDatabases = [
   },
 ];
 
-// Mock data for categories
+// Mock data for categories - Removed color and bgColor, they are now styled directly
 const databaseCategories = [
-  { name: 'جغرافیا و نقشه', icon: MapPin, color: 'text-emerald-500', bgColor: 'bg-emerald-50' },
-  { name: 'اقتصاد و بازار', icon: DollarSign, color: 'text-blue-500', bgColor: 'bg-blue-50' },
-  { name: 'آمار و جمعیت', icon: BarChart, color: 'text-yellow-500', bgColor: 'bg-yellow-50' },
-  { name: 'حمل و نقل', icon: Car, color: 'text-red-500', bgColor: 'bg-red-50' },
-  { name: 'گردشگری', icon: Plane, color: 'text-purple-500', bgColor: 'bg-purple-50' },
+  { name: 'جغرافیا و نقشه', icon: MapPin },
+  { name: 'اقتصاد و بازار', icon: DollarSign },
+  { name: 'آمار و جمعیت', icon: BarChart },
+  { name: 'حمل و نقل', icon: Car },
+  { name: 'گردشگری', icon: Plane },
   // Add more categories as needed
 ];
 
@@ -117,10 +117,10 @@ export default function HomePage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {databaseCategories.map((category) => (
             <Link key={category.name} href={`/category/${category.name}`} passHref>
-                <div className={`flex flex-col items-center justify-center p-4 rounded-lg border ${category.bgColor} hover:shadow-md transition-shadow cursor-pointer group dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700`}>
-                  <category.icon className={`w-10 h-10 mb-2 ${category.color} group-hover:scale-110 transition-transform`} />
-                  {/* Adjusted text color for dark mode potentially */}
-                  <span className={`text-sm font-medium ${category.color.replace('text-','text-')} dark:text-gray-300`}>{category.name}</span>
+                {/* Updated category box styling */}
+                <div className={`flex flex-col items-center justify-center p-4 rounded-lg border border-primary bg-card hover:shadow-lg hover:border-primary/80 transition-all duration-300 cursor-pointer group`}>
+                  <category.icon className={`w-10 h-10 mb-2 text-primary group-hover:scale-110 transition-transform`} />
+                  <span className={`text-sm font-medium text-primary`}>{category.name}</span>
                 </div>
             </Link>
           ))}

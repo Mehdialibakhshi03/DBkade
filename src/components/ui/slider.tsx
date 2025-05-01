@@ -17,8 +17,8 @@ const Slider = React.forwardRef<
     )}
     {...props}
   >
-    {/* Updated Track background */}
-    <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-primary/20 dark:bg-primary/30">
+    {/* Updated Track background to muted */}
+    <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-muted">
       {/* Apply gradient using CSS variables */}
       <SliderPrimitive.Range className="absolute h-full bg-gradient-to-r from-[hsl(var(--slider-gradient-from))] to-[hsl(var(--slider-gradient-to))]" />
     </SliderPrimitive.Track>
