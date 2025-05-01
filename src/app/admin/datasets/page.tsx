@@ -152,8 +152,10 @@ export default function AdminDatasetsPage() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>اقدامات</DropdownMenuLabel>
-                        <DropdownMenuItem>
-                          <Edit className="h-3.5 w-3.5 ml-2"/> ویرایش
+                        <DropdownMenuItem asChild>
+                           <Link href={`/admin/datasets/edit/${dataset.id}`} className="flex items-center w-full cursor-pointer">
+                            <Edit className="h-3.5 w-3.5 ml-2"/> ویرایش
+                          </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">
                           <Trash2 className="h-3.5 w-3.5 ml-2"/> حذف

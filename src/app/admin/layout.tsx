@@ -17,6 +17,7 @@ import {
   UserCog,
   List,
   Plus,
+  Key // Import Key icon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -56,8 +57,9 @@ const adminNavItems = [
     subItems: [
       { name: 'مشاهده همه', href: '/admin/datasets', icon: List }, // Added icons
       { name: 'افزودن جدید', href: '/admin/datasets/add', icon: Plus },
-      { name: 'دسته‌بندی‌ها', href: '/admin/categories', icon: Tag },
-      { name: 'تگ‌ها', href: '/admin/tags', icon: Tag },
+      { name: 'دسته‌بندی‌ها', href: '/admin/categories', icon: Tag }, // Corrected path
+      { name: 'تگ‌ها', href: '/admin/tags', icon: Tag }, // Corrected path
+      { name: 'کلیدهای API', href: '/admin/datasets/api', icon: Key }, // Added API Keys link
     ],
   },
   { name: 'کاربران', href: '/admin/users', icon: Users },
@@ -71,9 +73,11 @@ function AdminSidebar() {
 
     // Check if a path is active (exact match or parent of sub-item)
     const isActive = React.useCallback((href?: string, subItems?: { href: string }[]) => {
-        if (!href && subItems) {
-            // If no href for main item, check if any subitem is active
-             return subItems.some(sub => pathname === sub.href);
+        if (subItems) {
+            // If it's a parent item, check if any subitem is active or if the parent href itself is active (if it exists)
+             const isParentActive = href ? pathname.startsWith(href) : false;
+             const isSubItemActive = subItems.some(sub => pathname === sub.href);
+             return isParentActive || isSubItemActive;
         }
         if (href) {
             // For main items with href, check if the current path starts with the item's href

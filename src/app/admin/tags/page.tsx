@@ -60,8 +60,7 @@ export default function AdminTagsPage() {
    // Handlers for adding/editing tags would go here
 
   return (
-    // Removed main grid div
-    <>
+    <div className="grid flex-1 auto-rows-max gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
        <div className="flex items-center mb-4"> {/* Added mb-4 */}
         <h1 className="text-xl font-semibold">مدیریت تگ‌ها</h1>
          <div className="ml-auto flex items-center gap-2 mr-auto">
@@ -194,6 +193,6 @@ export default function AdminTagsPage() {
            {/* Add Pagination component here if needed */}
          </CardFooter>
        </Card>
-    </>
+    </div>
   );
 }
