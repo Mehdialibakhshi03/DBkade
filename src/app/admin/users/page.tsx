@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { PlusCircle, ListFilter, MoreHorizontal, Trash2, Edit, UserCog, File, User } from 'lucide-react'; // Added User icon
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button'; // Import buttonVariants
 import {
   Card,
   CardContent,
@@ -100,18 +100,34 @@ export default function AdminUsersPage() {
     const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
     const [isViewDialogOpen, setIsViewDialogOpen] = React.useState(false);
     const [selectedUser, setSelectedUser] = React.useState<UserType | null>(null);
-    const [newUser, setNewUser] = React.useState({ name: '', email: '', role: 'کاربر عادی' });
-    const [editUser, setEditUser] = React.useState<UserType | null>(null);
+    // State for new user form
+    const [newUserName, setNewUserName] = React.useState('');
+    const [newUserEmail, setNewUserEmail] = React.useState('');
+    const [newUserRole, setNewUserRole] = React.useState('کاربر عادی');
+    // State for edit user form
+    const [editUserId, setEditUserId] = React.useState<string | null>(null);
+    const [editUserName, setEditUserName] = React.useState('');
+    const [editUserEmail, setEditUserEmail] = React.useState('');
+    const [editUserRole, setEditUserRole] = React.useState('');
+    const [editUserStatus, setEditUserStatus] = React.useState('');
+
 
     // --- Handlers for Modals ---
     const handleOpenAddDialog = () => {
-        setNewUser({ name: '', email: '', role: 'کاربر عادی' }); // Reset form
+        // Reset form fields
+        setNewUserName('');
+        setNewUserEmail('');
+        setNewUserRole('کاربر عادی');
         setIsAddDialogOpen(true);
     };
 
     const handleOpenEditDialog = (user: UserType) => {
         setSelectedUser(user);
-        setEditUser({ ...user }); // Copy user data for editing
+        setEditUserId(user.id);
+        setEditUserName(user.name);
+        setEditUserEmail(user.email);
+        setEditUserRole(user.role);
+        setEditUserStatus(user.status);
         setIsEditDialogOpen(true);
     };
 
@@ -122,36 +138,55 @@ export default function AdminUsersPage() {
 
     const handleDialogClose = () => {
         setSelectedUser(null);
-        setEditUser(null); // Clear edit state
         setIsAddDialogOpen(false);
         setIsEditDialogOpen(false);
         setIsViewDialogOpen(false);
+        // Optionally reset edit form fields if needed
+        setEditUserId(null);
+        setEditUserName('');
+        setEditUserEmail('');
+        setEditUserRole('');
+        setEditUserStatus('');
     };
 
     // --- CRUD Operations (Mocked) ---
     const handleAddUser = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newUser.name || !newUser.email) {
+        if (!newUserName || !newUserEmail) {
             toast({ title: "خطا", description: "نام و ایمیل کاربر الزامی است.", variant: "destructive" });
             return;
         }
         const newUserToAdd: UserType = {
             id: `u${Math.random().toString(36).substring(2, 7)}`, // Generate random ID
-            ...newUser,
+            name: newUserName,
+            email: newUserEmail,
+            role: newUserRole,
             status: 'فعال', // Default status
-            joinDate: new Date().toLocaleDateString('fa-IR'), // Current date
+            joinDate: new Date().toLocaleDateString('fa-IR', { year: 'numeric', month: '2-digit', day: '2-digit' }), // Current date formatted
             avatarUrl: null, // Default avatar
         };
         setUsers([newUserToAdd, ...users]); // Add to the beginning of the list
-        toast({ title: "موفق", description: `کاربر '${newUser.name}' با موفقیت اضافه شد.` });
+        toast({ title: "موفق", description: `کاربر '${newUserToAdd.name}' با موفقیت اضافه شد.` });
         handleDialogClose();
     };
 
     const handleEditUser = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!editUser) return;
-        setUsers(users.map(u => u.id === editUser.id ? editUser : u));
-        toast({ title: "موفق", description: `اطلاعات کاربر '${editUser.name}' به‌روز شد.` });
+        if (!editUserId) return;
+
+        const updatedUser: UserType = {
+             id: editUserId,
+             name: editUserName,
+             email: editUserEmail,
+             role: editUserRole,
+             status: editUserStatus as 'فعال' | 'مسدود',
+             // Keep original joinDate and avatarUrl
+             joinDate: users.find(u => u.id === editUserId)?.joinDate || '',
+             avatarUrl: users.find(u => u.id === editUserId)?.avatarUrl || null,
+         };
+
+        setUsers(users.map(u => u.id === editUserId ? updatedUser : u));
+        toast({ title: "موفق", description: `اطلاعات کاربر '${updatedUser.name}' به‌روز شد.` });
         handleDialogClose();
     };
 
@@ -225,8 +260,8 @@ export default function AdminUsersPage() {
                         <Label htmlFor="add-user-name" className="text-right">نام</Label>
                         <Input
                             id="add-user-name"
-                            value={newUser.name}
-                            onChange={(e) => setNewUser({...newUser, name: e.target.value})}
+                            value={newUserName}
+                            onChange={(e) => setNewUserName(e.target.value)}
                             placeholder="نام کامل"
                             className="col-span-3"
                             required
@@ -237,8 +272,8 @@ export default function AdminUsersPage() {
                         <Input
                             id="add-user-email"
                             type="email"
-                            value={newUser.email}
-                            onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                            value={newUserEmail}
+                            onChange={(e) => setNewUserEmail(e.target.value)}
                             placeholder="user@example.com"
                             className="col-span-3"
                             required
@@ -248,8 +283,8 @@ export default function AdminUsersPage() {
                          <Label htmlFor="add-user-role" className="text-right">نقش</Label>
                          <Select
                             dir="rtl"
-                            value={newUser.role}
-                            onValueChange={(value) => setNewUser({...newUser, role: value})}
+                            value={newUserRole}
+                            onValueChange={(value) => setNewUserRole(value)}
                           >
                            <SelectTrigger id="add-user-role" className="col-span-3">
                              <SelectValue placeholder="انتخاب نقش" />
@@ -334,9 +369,9 @@ export default function AdminUsersPage() {
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuLabel>اقدامات</DropdownMenuLabel>
                                         <DialogTrigger asChild>
-                                        <DropdownMenuItem onSelect={() => handleOpenEditDialog(user)}>
-                                            <Edit className="h-3.5 w-3.5 ml-2" /> ویرایش نقش/وضعیت
-                                        </DropdownMenuItem>
+                                            <DropdownMenuItem onSelect={() => handleOpenEditDialog(user)}>
+                                                <Edit className="h-3.5 w-3.5 ml-2" /> ویرایش
+                                            </DropdownMenuItem>
                                         </DialogTrigger>
                                         <DialogTrigger asChild>
                                             <DropdownMenuItem onSelect={() => handleOpenViewDialog(user)}>
@@ -354,44 +389,44 @@ export default function AdminUsersPage() {
 
                                 {/* View User Dialog */}
                                 <DialogContent className="sm:max-w-[425px]" dir="rtl" onPointerDownOutside={handleDialogClose} onEscapeKeyDown={handleDialogClose}>
-                                <DialogHeader>
-                                    <DialogTitle>جزئیات کاربر: {selectedUser?.name}</DialogTitle>
-                                </DialogHeader>
-                                <div className="grid gap-4 py-4 text-sm">
-                                    {/* Display user details here */}
-                                    <p><strong>نام:</strong> {selectedUser?.name}</p>
-                                    <p><strong>ایمیل:</strong> {selectedUser?.email}</p>
-                                    <p><strong>نقش:</strong> {selectedUser?.role}</p>
-                                    <p><strong>وضعیت:</strong> {selectedUser?.status}</p>
-                                    <p><strong>تاریخ عضویت:</strong> {selectedUser?.joinDate}</p>
-                                </div>
-                                <DialogFooter>
-                                    <DialogClose asChild>
-                                    <Button type="button" variant="secondary" onClick={handleDialogClose}>بستن</Button>
-                                    </DialogClose>
-                                </DialogFooter>
+                                    <DialogHeader>
+                                        <DialogTitle>جزئیات کاربر: {selectedUser?.name}</DialogTitle>
+                                    </DialogHeader>
+                                    <div className="grid gap-4 py-4 text-sm">
+                                        {/* Display user details here */}
+                                        <p><strong>نام:</strong> {selectedUser?.name}</p>
+                                        <p><strong>ایمیل:</strong> {selectedUser?.email}</p>
+                                        <p><strong>نقش:</strong> {selectedUser?.role}</p>
+                                        <p><strong>وضعیت:</strong> {selectedUser?.status}</p>
+                                        <p><strong>تاریخ عضویت:</strong> {selectedUser?.joinDate}</p>
+                                    </div>
+                                    <DialogFooter>
+                                        <DialogClose asChild>
+                                        <Button type="button" variant="secondary" onClick={handleDialogClose}>بستن</Button>
+                                        </DialogClose>
+                                    </DialogFooter>
                                 </DialogContent>
                             </Dialog>
 
                            {/* Edit User Dialog */}
                            <DialogContent className="sm:max-w-[425px]" dir="rtl" onPointerDownOutside={handleDialogClose} onEscapeKeyDown={handleDialogClose}>
                              <DialogHeader>
-                               <DialogTitle>ویرایش کاربر: {editUser?.name}</DialogTitle>
+                               <DialogTitle>ویرایش کاربر: {selectedUser?.name}</DialogTitle> {/* Use selectedUser for title */}
                                <DialogDescription>نقش و وضعیت کاربر را تغییر دهید.</DialogDescription>
                              </DialogHeader>
                               <form onSubmit={handleEditUser}>
                                  <div className="grid gap-4 py-4">
                                    <div className="grid grid-cols-4 items-center gap-4">
                                      <Label htmlFor="edit-user-name" className="text-right">نام</Label>
-                                     <Input id="edit-user-name" value={editUser?.name || ''} onChange={(e) => editUser && setEditUser({...editUser, name: e.target.value})} className="col-span-3" required />
+                                     <Input id="edit-user-name" value={editUserName} onChange={(e) => setEditUserName(e.target.value)} className="col-span-3" required />
                                    </div>
                                    <div className="grid grid-cols-4 items-center gap-4">
                                      <Label htmlFor="edit-user-email" className="text-right">ایمیل</Label>
-                                     <Input id="edit-user-email" type="email" value={editUser?.email || ''} onChange={(e) => editUser && setEditUser({...editUser, email: e.target.value})} className="col-span-3" required />
+                                     <Input id="edit-user-email" type="email" value={editUserEmail} onChange={(e) => setEditUserEmail(e.target.value)} className="col-span-3" required />
                                    </div>
                                    <div className="grid grid-cols-4 items-center gap-4">
                                      <Label htmlFor="edit-user-role" className="text-right">نقش</Label>
-                                     <Select dir="rtl" value={editUser?.role || ''} onValueChange={(value) => editUser && setEditUser({...editUser, role: value})}>
+                                     <Select dir="rtl" value={editUserRole} onValueChange={(value) => setEditUserRole(value)}>
                                        <SelectTrigger id="edit-user-role" className="col-span-3">
                                          <SelectValue placeholder="انتخاب نقش" />
                                        </SelectTrigger>
@@ -404,7 +439,7 @@ export default function AdminUsersPage() {
                                    </div>
                                    <div className="grid grid-cols-4 items-center gap-4">
                                      <Label htmlFor="edit-user-status" className="text-right">وضعیت</Label>
-                                     <Select dir="rtl" value={editUser?.status || ''} onValueChange={(value) => editUser && setEditUser({...editUser, status: value as 'فعال' | 'مسدود'})}>
+                                     <Select dir="rtl" value={editUserStatus} onValueChange={(value) => setEditUserStatus(value as 'فعال' | 'مسدود')}>
                                        <SelectTrigger id="edit-user-status" className="col-span-3">
                                          <SelectValue placeholder="انتخاب وضعیت" />
                                        </SelectTrigger>
