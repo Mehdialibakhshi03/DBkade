@@ -41,14 +41,16 @@
     --chart-4: 30 80% 55%;
     --chart-5: 280 65% 60%;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 262 84% 58%; /* Purple */
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 240 5.9% 90%;
-    --sidebar-ring: 262 84% 58%; /* Purple */
+    /* Sidebar specific variables - Light Theme */
+    --sidebar-background: 0 0% 100%; /* White background */
+    --sidebar-foreground: 240 10% 15%; /* Darker text */
+    --sidebar-border: 240 5.9% 90%; /* Light border */
+    --sidebar-accent: 240 4.8% 95.9%; /* Light gray accent */
+    --sidebar-accent-foreground: 240 5.9% 10%; /* Dark text on accent */
+    --sidebar-primary: 262 84% 58%; /* Primary purple */
+    --sidebar-primary-foreground: 0 0% 98%; /* White text on primary */
+    --sidebar-ring: 262 84% 58%; /* Purple ring */
+
 
     /* Add slider gradient variables */
     --slider-gradient-from: 262 84% 58%; /* Primary Purple */
@@ -92,14 +94,16 @@
     --chart-4: 40 75% 60%;
     --chart-5: 300 70% 65%;
 
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 262 88% 70%; /* Lighter Purple */
-    --sidebar-primary-foreground: 240 10% 3.9%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 262 88% 70%; /* Lighter Purple */
+     /* Sidebar specific variables - Dark Theme */
+    --sidebar-background: 240 5.9% 10%; /* Dark background */
+    --sidebar-foreground: 0 0% 90%; /* Lighter text */
+    --sidebar-border: 240 3.7% 15.9%; /* Darker border */
+    --sidebar-accent: 240 3.7% 15.9%; /* Dark accent */
+    --sidebar-accent-foreground: 0 0% 98%; /* White text on accent */
+    --sidebar-primary: 262 88% 70%; /* Lighter Primary purple */
+    --sidebar-primary-foreground: 240 10% 3.9%; /* Dark text on primary */
+    --sidebar-ring: 262 88% 70%; /* Lighter Purple ring */
+
 
     /* Add dark mode slider gradient variables */
     --slider-gradient-from: 262 88% 70%; /* Lighter Primary Purple */
@@ -141,3 +145,22 @@
 /* .slider-track-background {
   background: linear-gradient(to right, hsl(var(--slider-gradient-from)), hsl(var(--slider-gradient-to)));
 } */
+
+/* Collapsible Content Animations */
+@keyframes collapsible-down {
+  from { height: 0; }
+  to { height: var(--radix-collapsible-content-height); }
+}
+
+@keyframes collapsible-up {
+  from { height: var(--radix-collapsible-content-height); }
+  to { height: 0; }
+}
+
+.animate-collapsible-down {
+  animation: collapsible-down 0.2s ease-out;
+}
+
+.animate-collapsible-up {
+  animation: collapsible-up 0.2s ease-out;
+}
