@@ -1,10 +1,9 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation'; // Import router and params
-import { ArrowRight, ChevronLeft } from 'lucide-react'; // Changed ArrowLeft to ChevronLeft for consistency
-import { Badge } from '@/components/ui/badge';
+import { ChevronLeft } from 'lucide-react'; // Changed ArrowLeft to ChevronLeft for consistency
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -24,20 +23,40 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox'; // Import Checkbox
+import { useToast } from '@/hooks/use-toast'; // Import useToast
 
 // Mock data - Replace with actual data fetching based on ID
 const categories = ['جغرافیا', 'اقتصاد', 'آمار', 'حمل و نقل', 'گردشگری'];
-const tags = ['ایران', 'کدپستی', 'قیمت', 'جمعیت', 'پرواز', 'خودرو'];
+const allTags = ['ایران', 'کدپستی', 'قیمت', 'جمعیت', 'پرواز', 'خودرو', 'تهران', 'منطقه شهرداری', 'کد اقتصادی']; // Expanded tag list
 
-// Mock dataset for editing (replace with actual data fetching)
-const mockDataset = {
-  id: 'ds001',
-  name: 'کدپستی شهرهای ایران',
-  description: 'مجموعه کامل کدهای پستی ۱۰ رقمی تمام شهرها و روستاهای ایران به تفکیک استان',
-  category: 'جغرافیا',
-  status: 'فعال',
-  selectedTags: ['ایران', 'کدپستی'], // Assuming these tags were selected
-  // Add file info if needed
+// Define Dataset Type
+interface Dataset {
+    id: string;
+    name: string;
+    description: string;
+    category: string;
+    status: string;
+    selectedTags: string[];
+    newTags: string; // Field for adding new tags
+}
+
+// Mock dataset for editing (replace with actual data fetching logic)
+const fetchMockDataset = (id: string): Dataset | null => {
+    // In a real app, fetch from API based on id
+    console.log(`Fetching dataset with id: ${id}`);
+    if (id === 'ds001') {
+        return {
+            id: 'ds001',
+            name: 'کدپستی شهرهای ایران',
+            description: 'مجموعه کامل کدهای پستی ۱۰ رقمی تمام شهرها و روستاهای ایران به تفکیک استان',
+            category: 'جغرافیا',
+            status: 'فعال',
+            selectedTags: ['ایران', 'کدپستی'],
+            newTags: '', // Initialize newTags as empty
+        };
+    }
+    // Add more mock datasets or return null if not found
+    return null;
 };
 
 
@@ -45,26 +64,72 @@ export default function EditDatasetPage() {
   const router = useRouter();
   const params = useParams();
   const datasetId = params.id as string; // Get dataset ID from URL
+  const { toast } = useToast();
 
-  // TODO: Fetch dataset details based on datasetId
-  const [dataset, setDataset] = React.useState(mockDataset); // Use fetched data
+  const [dataset, setDataset] = useState<Dataset | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Add state and form handling logic here (e.g., using react-hook-form)
-  const [selectedTags, setSelectedTags] = React.useState<string[]>(dataset.selectedTags);
+  useEffect(() => {
+    // Simulate fetching data
+    const fetchedDataset = fetchMockDataset(datasetId);
+    if (fetchedDataset) {
+      setDataset(fetchedDataset);
+    } else {
+      // Handle case where dataset is not found (e.g., show error, redirect)
+      toast({ title: "خطا", description: "دیتاست مورد نظر یافت نشد.", variant: "destructive" });
+      router.push('/admin/datasets'); // Redirect back
+    }
+    setLoading(false);
+  }, [datasetId, router, toast]);
 
-  const handleTagChange = (tag: string, checked: boolean) => {
-    setSelectedTags(prev =>
-      checked ? [...prev, tag] : prev.filter(t => t !== tag)
-    );
-    // Update form state accordingly
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    if (!dataset) return;
+    const { id, value } = e.target;
+    setDataset({ ...dataset, [id]: value });
   };
 
-  const handleSaveChanges = () => {
+  const handleSelectChange = (id: keyof Dataset, value: string) => {
+    if (!dataset) return;
+    setDataset({ ...dataset, [id]: value });
+  };
+
+ const handleTagChange = (tag: string, checked: boolean) => {
+   if (!dataset) return;
+   const currentSelectedTags = dataset.selectedTags || [];
+   let updatedTags;
+   if (checked) {
+     updatedTags = [...currentSelectedTags, tag];
+   } else {
+     updatedTags = currentSelectedTags.filter(t => t !== tag);
+   }
+   setDataset({ ...dataset, selectedTags: updatedTags });
+ };
+
+ const handleSaveChanges = () => {
+    if (!dataset) return;
     // TODO: Implement save logic using API call
-    console.log("Saving changes for dataset:", datasetId, dataset, selectedTags);
-    // Redirect back to datasets list or show success message
+    console.log("Saving changes for dataset:", datasetId, dataset);
+    // Combine selectedTags and newTags (split by comma, trim, filter empty)
+    const newTagsArray = dataset.newTags.split(',').map(t => t.trim()).filter(t => t !== '');
+    const finalTags = Array.from(new Set([...dataset.selectedTags, ...newTagsArray]));
+    console.log("Final tags to save:", finalTags);
+
+    // Simulate API call success
+    toast({ title: "موفق", description: `تغییرات دیتاست '${dataset.name}' ذخیره شد.` });
+
+    // Optionally redirect back after saving
     router.push('/admin/datasets');
   };
+
+  if (loading) {
+    // TODO: Add a proper loading state UI (e.g., Skeleton)
+    return <div>در حال بارگذاری...</div>;
+  }
+
+  if (!dataset) {
+    // Dataset not found state (already handled by redirect in useEffect, but good practice)
+    return <div>دیتاست یافت نشد.</div>;
+  }
 
 
   return (
@@ -103,8 +168,8 @@ export default function EditDatasetPage() {
                   id="name"
                   type="text"
                   className="w-full"
-                  defaultValue={dataset.name}
-                  onChange={(e) => setDataset({...dataset, name: e.target.value})}
+                  value={dataset.name}
+                  onChange={handleInputChange}
                   placeholder="مثال: قیمت روز سکه"
                 />
               </div>
@@ -112,8 +177,8 @@ export default function EditDatasetPage() {
                 <Label htmlFor="description">توضیحات</Label>
                 <Textarea
                   id="description"
-                  defaultValue={dataset.description}
-                   onChange={(e) => setDataset({...dataset, description: e.target.value})}
+                  value={dataset.description}
+                  onChange={handleInputChange}
                   placeholder="توضیح مختصری درباره محتوای دیتاست بنویسید."
                   className="min-h-32"
                 />
@@ -121,7 +186,7 @@ export default function EditDatasetPage() {
               <div className="grid grid-cols-2 gap-4">
                  <div className="grid gap-3">
                     <Label htmlFor="category">دسته‌بندی</Label>
-                    <Select dir="rtl" value={dataset.category} onValueChange={(value) => setDataset({...dataset, category: value})}>
+                    <Select dir="rtl" value={dataset.category} onValueChange={(value) => handleSelectChange('category', value)}>
                       <SelectTrigger id="category" aria-label="انتخاب دسته‌بندی">
                         <SelectValue placeholder="انتخاب دسته‌بندی" />
                       </SelectTrigger>
@@ -134,7 +199,7 @@ export default function EditDatasetPage() {
                   </div>
                  <div className="grid gap-3">
                     <Label htmlFor="status">وضعیت</Label>
-                    <Select dir="rtl" value={dataset.status} onValueChange={(value) => setDataset({...dataset, status: value})}>
+                    <Select dir="rtl" value={dataset.status} onValueChange={(value) => handleSelectChange('status', value)}>
                       <SelectTrigger id="status" aria-label="انتخاب وضعیت">
                         <SelectValue placeholder="انتخاب وضعیت" />
                       </SelectTrigger>
@@ -158,7 +223,7 @@ export default function EditDatasetPage() {
           </CardHeader>
           <CardContent>
              {/* Placeholder for file upload component - show current file info */}
-             <div className="text-sm text-muted-foreground mb-4">فایل فعلی: {dataset.name}.csv (این بخش نیاز به تکمیل دارد)</div>
+             <div className="text-sm text-muted-foreground mb-4">فایل فعلی: {dataset.name.replace(/ /g,'_')}.csv (نمایشی)</div>
              <div className="flex items-center justify-center w-full">
                  <Label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-muted hover:bg-muted/80">
                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -182,12 +247,12 @@ export default function EditDatasetPage() {
             <div className="grid gap-3">
                <Label>انتخاب تگ‌های موجود</Label>
                <div className="flex flex-wrap gap-2">
-                 {tags.map((tag) => (
+                 {allTags.map((tag) => (
                    <div key={tag} className="flex items-center space-x-2 space-x-reverse">
                      <Checkbox
                         id={`tag-${tag}`}
-                        checked={selectedTags.includes(tag)}
-                        onCheckedChange={(checked) => handleTagChange(tag, !!checked)}
+                        checked={(dataset.selectedTags || []).includes(tag)} // Ensure selectedTags is an array
+                        onCheckedChange={(checked) => handleTagChange(tag, !!checked)} // Ensure checked is boolean
                       />
                      <Label htmlFor={`tag-${tag}`} className="text-sm font-normal cursor-pointer">
                        {tag}
@@ -196,8 +261,14 @@ export default function EditDatasetPage() {
                  ))}
                </div>
                  <div className="grid gap-3 mt-4">
-                  <Label htmlFor="new-tags">افزودن تگ جدید (با کاما جدا کنید)</Label>
-                  <Input id="new-tags" type="text" placeholder="مثال: منطقه شهرداری, کد اقتصادی" />
+                  <Label htmlFor="newTags">افزودن تگ جدید (با کاما جدا کنید)</Label>
+                  <Input
+                      id="newTags"
+                      type="text"
+                      placeholder="مثال: منطقه شهرداری, کد اقتصادی"
+                      value={dataset.newTags}
+                      onChange={handleInputChange}
+                  />
                  </div>
             </div>
           </CardContent>
