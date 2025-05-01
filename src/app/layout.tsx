@@ -97,7 +97,7 @@ export default function RootLayout({
     // Added suppressHydrationWarning to mitigate issues with browser extensions modifying the DOM
     <html lang="fa" dir="rtl" className={`${inter.variable}`} suppressHydrationWarning>
       {/* Apply font-sans which uses the --font-sans variable */}
-      <body className="font-sans antialiased bg-background text-foreground"> {/* Apply background and text colors */}
+      <body className="font-sans antialiased bg-background text-foreground" suppressHydrationWarning> {/* Apply background and text colors, add suppressHydrationWarning */}
         <div className="flex flex-col min-h-screen">
            {/* Header reused from page.tsx logic - Consider making this a shared component */}
            <header className="bg-card border-b sticky top-0 z-50">
