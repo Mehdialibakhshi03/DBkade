@@ -1,8 +1,8 @@
-'use client';
+ 'use client';
 
 import React from 'react';
 import Link from 'next/link';
-import { Database, Search, Star, Download, Grid, BarChart, DollarSign, Car, Plane, MapPin, Calendar, DatabaseZap, LayoutDashboard } from 'lucide-react'; // Added Calendar, DatabaseZap, LayoutDashboard
+import { Database, Search, Star, Download, Grid, BarChart, DollarSign, Car, Plane, MapPin, Calendar, DatabaseZap } from 'lucide-react'; // Removed LayoutDashboard as it's in header
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -58,35 +58,11 @@ const databaseCategories = [
   // Add more categories as needed
 ];
 
-// Header component specific to this page
-function HomePageHeader() {
-  return (
-    <header className="bg-card border-b sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
-        <Link href="/" className="flex items-center"> {/* Wrap logo and title in Link */}
-          <Database className="h-8 w-8 text-primary mr-2" />
-          <h1 className="text-xl font-bold">دیتا اکسپلورر</h1>
-        </Link>
-        <div className="flex items-center space-x-4 space-x-reverse">
-          <Button asChild variant="outline">
-             <Link href="/admin">
-               <LayoutDashboard className="w-4 h-4 ml-2" />
-               پنل مدیریت
-             </Link>
-           </Button>
-          <Button>
-            ورود / ثبت‌نام
-          </Button>
-        </div>
-      </div>
-    </header>
-  );
-}
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <HomePageHeader /> {/* Add the specific header */}
+      {/* Header is now handled by layout.tsx */}
 
       {/* Hero Section */}
       <section className="relative py-20 px-4 text-center bg-gradient-to-b from-background to-primary/5 overflow-hidden"> {/* Changed gradient */}

@@ -51,6 +51,7 @@ const adminNavItems = [
   { name: 'داشبورد', href: '/admin', icon: LayoutDashboard },
   {
     name: 'دیتاست‌ها',
+    // No href for parent item, rely on sub-items
     icon: Database,
     subItems: [
       { name: 'مشاهده همه', href: '/admin/datasets', icon: List }, // Added icons
@@ -69,16 +70,21 @@ function AdminSidebar() {
     const pathname = usePathname(); // Get current path
 
     // Check if a path is active (exact match or parent of sub-item)
-    const isActive = React.useCallback((href: string, isSubItem = false) => {
-        if (isSubItem) {
-            return pathname === href;
+    const isActive = React.useCallback((href?: string, subItems?: { href: string }[]) => {
+        if (!href && subItems) {
+            // If no href for main item, check if any subitem is active
+             return subItems.some(sub => pathname === sub.href);
         }
-        // For main items, check if the current path starts with the item's href
-        // Ensure dashboard is only active for exact match
-        if (href === '/admin') {
-            return pathname === href;
+        if (href) {
+            // For main items with href, check if the current path starts with the item's href
+            // Ensure dashboard is only active for exact match
+            if (href === '/admin') {
+                return pathname === href;
+            }
+            // Check if current path starts with href or matches exactly
+            return pathname.startsWith(href);
         }
-        return pathname.startsWith(href);
+        return false;
     }, [pathname]);
 
     return (
@@ -97,8 +103,8 @@ function AdminSidebar() {
                         item.subItems ? (
                             <SidebarMenuItem key={item.name}>
                                 <SidebarMenuButton
-                                    // Active if the main item path is active OR any subitem path is active
-                                    isActive={isActive(item.href) || item.subItems.some(sub => isActive(sub.href, true))}
+                                    // Active if any subitem path is active
+                                    isActive={isActive(undefined, item.subItems)}
                                     tooltip={state === 'collapsed' ? item.name : undefined}
                                 >
                                     <item.icon />
@@ -109,7 +115,7 @@ function AdminSidebar() {
                                     {item.subItems.map((subItem) => (
                                         <SidebarMenuSubItem key={subItem.name}>
                                             <Link href={subItem.href} passHref legacyBehavior>
-                                                <SidebarMenuSubButton isActive={isActive(subItem.href, true)}>
+                                                <SidebarMenuSubButton isActive={pathname === subItem.href}>
                                                     {subItem.icon && <subItem.icon className="ml-2 h-4 w-4" />} {/* Added sub-item icon */}
                                                     {subItem.name}
                                                 </SidebarMenuSubButton>
@@ -172,15 +178,15 @@ function AdminSidebar() {
 
 
 function AdminHeader() {
-    const { isMobile, toggleSidebar, state } = useSidebar(); // Get sidebar state
+    const { isMobile, toggleSidebar } = useSidebar(); // Get sidebar state and toggle function
 
     return (
         <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
             {/* Sidebar Trigger */}
-            <Button size="icon" variant="outline" onClick={toggleSidebar} className="sm:hidden"> {/* Always show on mobile */}
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle Menu</span>
-            </Button>
+             <Button size="icon" variant="outline" onClick={toggleSidebar} className={isMobile ? "" : "sm:hidden"}> {/* Show on mobile, hide on desktop unless mobile */}
+                 <Menu className="h-5 w-5" />
+                 <span className="sr-only">Toggle Menu</span>
+             </Button>
              {/* Desktop Trigger (appears when not mobile) */}
              {!isMobile && (
                  <Button size="icon" variant="ghost" onClick={toggleSidebar} className="hidden sm:flex">
@@ -214,7 +220,8 @@ export default function AdminLayout({
                 <AdminSidebar />
                  {/* Main content area adjustment based on sidebar state */}
                 {/* Updated class for proper padding based on sidebar width and state */}
-                <div className="flex flex-col sm:gap-4 sm:py-4 transition-all duration-200 ease-linear group-data-[sidebar-hidden=false]/sidebar-wrapper:sm:pr-[--sidebar-width] group-data-[sidebar-hidden=true]/sidebar-wrapper:sm:pr-[--sidebar-width-icon]">
+                 {/* Use pr for right-side sidebar */}
+                <div className="flex flex-col sm:gap-4 sm:py-4 transition-all duration-200 ease-linear group-data-[sidebar-hidden=false]/sidebar-wrapper:sm:mr-[var(--sidebar-width)] group-data-[sidebar-hidden=true]/sidebar-wrapper:sm:mr-[var(--sidebar-width-icon)]">
                     <AdminHeader />
                     <main className="flex-1 p-4 sm:px-6 sm:py-0">{children}</main>
                 </div>

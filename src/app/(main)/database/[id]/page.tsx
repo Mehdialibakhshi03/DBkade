@@ -2,10 +2,11 @@
 
 import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation'; // Import useRouter for navigation
+import Link from 'next/link'; // Import Link
 import {
   Database, Download, FileJson, FileText, File, Code,
   Copy, Eye, Calendar, HardDrive, BarChart, Check, Filter, ArrowLeft, Info, Star,
-  Cloud, RefreshCw, Link, X
+  Cloud, RefreshCw, Link as LinkIcon, X // Renamed Link to LinkIcon to avoid conflict
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -253,11 +254,11 @@ else:
       <div className="bg-card border-b">
         <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8 flex justify-between items-center"> {/* Added justify-between */}
           <div className="flex items-center text-sm text-muted-foreground">
-             {/* Consider using Link component for navigation */}
-             <a href="/" className="hover:text-primary">خانه</a>
+             {/* Use Link component for navigation */}
+             <Link href="/" className="hover:text-primary">خانه</Link>
             <span className="mx-2">/</span>
             {/* Update this link if categories exist */}
-            <a href="#" className="hover:text-primary">دسته جغرافیا</a>
+            <Link href="#" className="hover:text-primary">دسته جغرافیا</Link>
             <span className="mx-2">/</span>
             <span className="text-foreground font-medium">{databaseInfo.title}</span>
           </div>
@@ -594,9 +595,9 @@ else:
                            </Button>
                          </div>
                        </div>
-                        <div className="text-xs text-muted-foreground">
-                            <Link className="inline-block w-3 h-3 ml-1"/>
-                            <a href="#" className="hover:underline">مستندات کامل API</a>
+                        <div className="text-xs text-muted-foreground flex items-center"> {/* Use flex and items-center */}
+                            <LinkIcon className="inline-block w-3 h-3 ml-1"/> {/* Changed Link to LinkIcon */}
+                            <Link href="#" className="hover:underline">مستندات کامل API</Link> {/* Use Link component */}
                         </div>
                     </div>
                   </DialogContent>
@@ -627,25 +628,25 @@ else:
               <CardContent>
                 <ul className="space-y-3">
                   <li>
-                    {/* Consider using Link component for navigation */}
-                    <a href="#" className="flex items-center text-sm hover:text-primary group">
+                    {/* Use Link component for navigation */}
+                    <Link href="#" className="flex items-center text-sm hover:text-primary group">
                       <Database className="w-4 h-4 ml-2 text-muted-foreground group-hover:text-primary" />
                       تقسیمات کشوری ایران
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    {/* Consider using Link component for navigation */}
-                    <a href="#" className="flex items-center text-sm hover:text-primary group">
+                    {/* Use Link component for navigation */}
+                    <Link href="#" className="flex items-center text-sm hover:text-primary group">
                       <Database className="w-4 h-4 ml-2 text-muted-foreground group-hover:text-primary" />
                       مختصات جغرافیایی شهرهای ایران
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    {/* Consider using Link component for navigation */}
-                    <a href="#" className="flex items-center text-sm hover:text-primary group">
+                    {/* Use Link component for navigation */}
+                    <Link href="#" className="flex items-center text-sm hover:text-primary group">
                       <Database className="w-4 h-4 ml-2 text-muted-foreground group-hover:text-primary" />
                       جمعیت شهرهای ایران
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </CardContent>

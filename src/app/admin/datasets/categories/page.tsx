@@ -59,9 +59,10 @@ export default function AdminCategoriesPage() {
   // Handlers for adding/editing categories would go here
 
   return (
-    <div className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
-       <div className="flex items-center">
-         {/* Search or Filter can be added here if needed */}
+    // Removed main grid div
+    <>
+       <div className="flex items-center mb-4"> {/* Added mb-4 */}
+         <h1 className="text-xl font-semibold">مدیریت دسته‌بندی‌ها</h1>
          <div className="ml-auto flex items-center gap-2 mr-auto">
             {/* Export button can be added here */}
            <Button size="sm" variant="outline" className="h-7 gap-1">
@@ -203,6 +204,6 @@ export default function AdminCategoriesPage() {
            {/* Add Pagination component here if needed */}
          </CardFooter>
        </Card>
-    </div>
+    </>
   );
 }
