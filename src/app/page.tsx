@@ -77,7 +77,7 @@ export default function HomePage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative py-20 px-4 text-center bg-gradient-to-b from-background to-secondary/30 overflow-hidden">
+      <section className="relative py-20 px-4 text-center bg-gradient-to-b from-background to-primary/5 overflow-hidden"> {/* Changed gradient */}
         {/* Animated Background Elements */}
         <div className="absolute inset-0 z-0 opacity-10 dark:opacity-5 pointer-events-none">
            {/* Position icons randomly */}
@@ -98,7 +98,7 @@ export default function HomePage() {
             <Input
               type="search"
               placeholder="جستجو در میان دیتاست‌ها..."
-              className="flex-grow h-12 pr-4 text-base rounded-lg shadow-md bg-background" // Removed pl-10, changed rounded-full to rounded-lg
+              className="flex-grow h-12 pr-4 text-base rounded-lg shadow-md bg-card" // Changed background to card
             />
             <Button size="lg" className="h-12 px-6 rounded-lg"> {/* Added Search Button */}
               <Search className="w-5 h-5 ml-2" />
@@ -117,8 +117,8 @@ export default function HomePage() {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {databaseCategories.map((category) => (
             <Link key={category.name} href={`/category/${category.name}`} passHref>
-                {/* Updated category box styling */}
-                <div className={`flex flex-col items-center justify-center p-4 rounded-lg border border-primary bg-card hover:shadow-lg hover:border-primary/80 transition-all duration-300 cursor-pointer group`}>
+                {/* Updated category box styling with better hover */}
+                <div className={`flex flex-col items-center justify-center p-4 rounded-lg border border-primary bg-primary/5 hover:bg-primary/10 hover:shadow-md transition-all duration-300 cursor-pointer group`}>
                   <category.icon className={`w-10 h-10 mb-2 text-primary group-hover:scale-110 transition-transform`} />
                   <span className={`text-sm font-medium text-primary`}>{category.name}</span>
                 </div>
@@ -136,7 +136,7 @@ export default function HomePage() {
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {popularDatabases.map((db) => (
-            <Card key={db.id} className="hover:shadow-lg transition-shadow duration-300 flex flex-col"> {/* Added flex flex-col */}
+            <Card key={db.id} className="hover:shadow-lg transition-shadow duration-300 flex flex-col bg-card"> {/* Ensure card background */}
               <CardHeader>
                 <div className="flex items-center mb-2">
                   <Database className="w-5 h-5 mr-2 text-primary" />

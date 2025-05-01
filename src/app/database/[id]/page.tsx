@@ -417,7 +417,7 @@ else:
                              <CardContent className="p-4 pt-0">
                                {/* Render appropriate control based on filter type */}
                                {filter.type === 'range' && filter.min !== undefined && filter.max !== undefined && Array.isArray(filterState.value) && (
-                                 <div className="space-y-3">
+                                 <div className="space-y-3 mt-2"> {/* Added mt-2 for spacing */}
                                    <Slider
                                      id={`filter-control-${filter.id}`}
                                      min={filter.min}
